@@ -33,15 +33,7 @@ abstract class StudentDatabase : RoomDatabase(){
                 return instance
             }
         }
-//    fun getStudentDatabase(context: Context){
-//        if (studentDatabase == null){
-//            studentDatabase = Room.databaseBuilder(
-//                context.applicationContext,
-//                StudentDatabase::class.java,
-//                dbName
-//            ).build()
-//        }
-//    }
+
     }
 
 }

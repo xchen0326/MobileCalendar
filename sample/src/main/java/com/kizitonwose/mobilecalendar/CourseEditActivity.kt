@@ -7,14 +7,11 @@ import android.icu.util.Calendar
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.kizitonwose.mobilecalendar.databinding.CourseEditFragmentBinding
-import database.StudentDao_Impl
+
 //import database.StudentTypeConverters
 
 private const val TAG = "SaveActivity"
@@ -55,6 +52,7 @@ class CourseEditActivity : AppCompatActivity() {
 
         val today: String = intent.getStringExtra("DATE") ?: "invalid date"
 
+        //time picker for entering start time
         sTimeP.setOnClickListener{
             val c = Calendar.getInstance()
             val ampm = c.get(Calendar.AM_PM)
@@ -82,6 +80,8 @@ class CourseEditActivity : AppCompatActivity() {
             tpd.show()
         }
 
+
+        //time picker for entering end time.
         eTimeP.setOnClickListener{
             val c = Calendar.getInstance()
             val ampm = c.get(Calendar.AM_PM)
@@ -108,12 +108,17 @@ class CourseEditActivity : AppCompatActivity() {
             )
             tpd.show()
         }
+
+        //Return to the CalendarFragment
         cancelBtn.setOnClickListener{
             finish();
         }
 
+
+        //Return to the CalendarFragment and save course to database
         saveBtn.setOnClickListener {
             if(checkValid()){
+                //Construct Course
                 Toast.makeText(this, "saved", Toast.LENGTH_SHORT).show()
                 var course = Course()
                 var lod = mutableListOf<String>()
@@ -137,7 +142,7 @@ class CourseEditActivity : AppCompatActivity() {
                     }
                 }
 
-
+                //check username then save the course into the database under the user.
                 val user_name = HomeActivity.instance?.user_name
                 val pass_word = HomeActivity.instance?.pass_word
                 if (user_name != null&&pass_word != null) {
@@ -167,7 +172,7 @@ class CourseEditActivity : AppCompatActivity() {
 
 
 
-                //return course
+                //return the course details back to CalendarFragment.
                 val data = Intent().apply {
                     putExtra("SUCCESS", 1)
                     putExtra("COURSE_NAME", course.getCourseName())
@@ -177,14 +182,9 @@ class CourseEditActivity : AppCompatActivity() {
                     putExtra("TERM", course.getCourseTerm())
                     val lodArray: ArrayList<String> = ArrayList(lod)
                     putExtra("DAY_IN_WEEK",lodArray)
-                    //putExtra("DAY_IN_WEEK", lod)
 
                 }
                 setResult(Activity.RESULT_OK, data)
-//                val intent = getIntent()
-//                val username = intent.getStringExtra("USERNAME")
-//                val password = intent.getStringExtra("PASSWORD")
-
                 finish()
 
             }else{
@@ -193,6 +193,7 @@ class CourseEditActivity : AppCompatActivity() {
         }
     }
 
+    //Check if all fields have valid entry
     fun checkValid() : Boolean{
         if (nameET.text.isEmpty() || locET.text.isEmpty() || sTimeP.text.isEmpty() || eTimeP.text.isEmpty()){
             return false

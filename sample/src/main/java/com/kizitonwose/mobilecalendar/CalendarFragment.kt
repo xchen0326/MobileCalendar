@@ -34,6 +34,8 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.*
 
+//=======================================================================================================
+//For iterating through a range of Local Date.
 
 public interface ClosedRange<T: Comparable<T>> {
     public val start: T
@@ -64,9 +66,11 @@ class DateProgression(override val start: LocalDate,
 }
 
 operator fun LocalDate.rangeTo(other: LocalDate) = DateProgression(this, other)
+//=====================================================================================================
 
 
-
+//=====================================================================================================
+// Each course displayed on the calendar is saved as an event .
 data class Event(val id: String, val text: String, val date: LocalDate)
 
 class EventsAdapter(val onClick: (Event) -> Unit) :
@@ -100,6 +104,10 @@ class EventsAdapter(val onClick: (Event) -> Unit) :
         }
     }
 }
+//=====================================================================================================
+
+
+
 
 class CalendarFragment : BaseFragment(R.layout.calendar_fragment), HasBackButton {
 
@@ -159,6 +167,8 @@ class CalendarFragment : BaseFragment(R.layout.calendar_fragment), HasBackButton
 
     private lateinit var binding: CalendarFragmentBinding
 
+
+    //WPI 2020-2021 Calendar, end and start date for each term.
     private val aTermStartDate:LocalDate = LocalDate.of(2020, 8, 31)
     private val aTermEndDate:LocalDate = LocalDate.of(2020, 10, 16)
     private val aTerm: DateProgression = aTermStartDate..aTermEndDate;
@@ -182,10 +192,12 @@ class CalendarFragment : BaseFragment(R.layout.calendar_fragment), HasBackButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //get course under a student from local database.
         stuViewModel = ViewModelProvider(this).get(StudentViewModel::class.java)
         courseString =
             stuViewModel.getStudentCourses(HomeActivity.instance?.user_name?: "invalid user").toString()
-        //getStudentCourses(HomeActivity.instance?.user_name?: "invalid user")?: String?
+
         if(courseString != "invalid user"){
             courseList = converter.toListCourse(courseString)!!
         }
@@ -194,7 +206,7 @@ class CalendarFragment : BaseFragment(R.layout.calendar_fragment), HasBackButton
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
+        //Displyy calendar.
         binding = CalendarFragmentBinding.bind(view)
         binding.Rv.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
@@ -228,6 +240,8 @@ class CalendarFragment : BaseFragment(R.layout.calendar_fragment), HasBackButton
                 }
             }
         }
+
+        //bind each day entry to a view.
         binding.Calendar.dayBinder = object : DayBinder<DayViewContainer> {
             override fun create(view: View) = DayViewContainer(view)
             override fun bind(container: DayViewContainer, day: CalendarDay) {
@@ -263,6 +277,7 @@ class CalendarFragment : BaseFragment(R.layout.calendar_fragment), HasBackButton
             }
         }
 
+        //set up left and right scroll for the calendar.
         binding.Calendar.monthScrollListener = {
             homeActivityToolbar.title = if (it.year == today.year) {
                 titleSameYearFormatter.format(it.yearMonth)
@@ -278,6 +293,7 @@ class CalendarFragment : BaseFragment(R.layout.calendar_fragment), HasBackButton
         class MonthViewContainer(view: View) : ViewContainer(view) {
             val legendLayout = CalendarHeaderBinding.bind(view).legendLayout.root
         }
+
         binding.Calendar.monthHeaderBinder = object : MonthHeaderFooterBinder<MonthViewContainer> {
             override fun create(view: View) = MonthViewContainer(view)
             override fun bind(container: MonthViewContainer, month: CalendarMonth) {
@@ -292,6 +308,7 @@ class CalendarFragment : BaseFragment(R.layout.calendar_fragment), HasBackButton
             }
         }
 
+        //When user press the add button, launch the CourseEditActivity.
         binding.AddButton.setOnClickListener {
 
             // Start CourseEditActivity
@@ -303,11 +320,14 @@ class CalendarFragment : BaseFragment(R.layout.calendar_fragment), HasBackButton
             startActivityForResult(intent,0)
         }
 
+        //To refresh the calendar to display the blue dots correctly.
         binding.FreshButton.setOnClickListener{
             println("fresh is clicked")
             (activity as HomeActivity).freshCalendar(view)
         }
 
+
+        //Display the courses from initial read from database under each day. .
         if(!courseList.isNullOrEmpty()) {
             for (course in courseList) {
                 val courseName: String = course.getCourseName()
@@ -336,6 +356,8 @@ class CalendarFragment : BaseFragment(R.layout.calendar_fragment), HasBackButton
         }
     }
 
+
+    //add a course to calendar under the correct day of week and term.
     private fun addCourseToCalendar(term: DateProgression, courseDetail: String, dayOfWeek: ArrayList<String>){
         val fixSelectedDate = selectedDate
 
@@ -399,6 +421,8 @@ class CalendarFragment : BaseFragment(R.layout.calendar_fragment), HasBackButton
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+
+        //On return of CourseEditActivtiy, put the course under correct days.
         var courseName: String = data?.getStringExtra("COURSE_NAME") ?: "invalid name"
         var location: String = data?.getStringExtra("LOCATION") ?: "invalid location"
         val startTime: String = data?.getStringExtra("START_TIME") ?: "invalid start time"
@@ -432,6 +456,8 @@ class CalendarFragment : BaseFragment(R.layout.calendar_fragment), HasBackButton
 //        Toast.makeText(context, courseName, Toast.LENGTH_SHORT).show()
     }
 
+
+    //when user click a date, update internal selectedDate.
     private fun selectDate(date: LocalDate) {
         if (selectedDate != date) {
             val oldDate = selectedDate
@@ -442,6 +468,7 @@ class CalendarFragment : BaseFragment(R.layout.calendar_fragment), HasBackButton
         }
     }
 
+    //Save event to the selected date as a string.
     private fun saveEvent(text: String) {
         if (text.isBlank()) {
             Toast.makeText(requireContext(), R.string.empty_input_text, Toast.LENGTH_LONG).show()

@@ -2,7 +2,7 @@ package com.kizitonwose.mobilecalendar
 
 
 class Converter{
-
+        //list of Course to Stirng
         fun fromListCourse(loc: MutableList<Course>?): String?{
             var str = String()
             if (loc != null) {
@@ -14,6 +14,7 @@ class Converter{
             return str
         }
 
+        //string to list of course
         fun toListCourse(course: String?): MutableList<Course>? {
             if(course != null){
                 val list = course.split('/').map { it.trim() }
@@ -30,6 +31,8 @@ class Converter{
             }
         }
 
+
+        //Course to string
         fun fromCourse(course: Course?): String?{
             var rec = String()
             if(course?.getRecurrance() == null){
@@ -47,6 +50,7 @@ class Converter{
                     ','+ course?.getCourseTerm() + ','
         }
 
+        //string to course
         fun toCourse(course: String?): Course?{
             if(course != null){
                 val list = course.split(',').map { it.trim() }

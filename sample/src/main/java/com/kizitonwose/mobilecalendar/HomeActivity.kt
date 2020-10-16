@@ -46,6 +46,8 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //initiate view model and launch the Login Page
         binding = HomeActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         instance = this
@@ -60,14 +62,10 @@ class HomeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         showLoginFragment()//shows the login page
-//        val btn = findViewById<Button>(R.id.loginChangeFragment)
-//        btn.setOnClickListener(){
-//
-//        }
-        //showCourseFragment()
-//        showCalendarFragment()
     }
 
+
+    //show loginFragment
     fun showLoginFragment(){
         val transaction = manager.beginTransaction()
         val frag = LoginFragment()
@@ -76,14 +74,8 @@ class HomeActivity : AppCompatActivity() {
         transaction.commit()
     }
 
-    fun showCourseFragment(){
-        val transaction = manager.beginTransaction()
-        val frag = CourseFragment()
-        transaction.replace(R.id.fragment_holder, frag)
-        transaction.addToBackStack(null)
-        transaction.commit()
-    }
 
+    //show calendarFragment
     fun showCalendarFragment(){
         val transaction = manager.beginTransaction()
         val frag = CalendarFragment()
@@ -92,39 +84,23 @@ class HomeActivity : AppCompatActivity() {
         transaction.commit()
     }
 
+
     fun freshCalendar(view: View){
-//        var frg: Fragment? = supportFragmentManager.findFragmentById(R.id.fragment_holder)
         val transaction = manager.beginTransaction()
-//        if (frg != null) {
-//            transaction.detach(frg)
-//            println("detach the view")
-//        }
-//        if (frg != null) {
-//            transaction.attach(frg)
-//            println("reattach the view")
-//        }
         val frag = CalendarFragment()
         transaction.replace(R.id.fragment_holder, frag)
         transaction.addToBackStack(null)
         transaction.commit()
     }
 
+
+    //user press login button, check the if username match the password
     fun userLogin(view: View){
         val passwordText = findViewById<EditText>(R.id.passWord).text.toString()
         val usernameText = findViewById<EditText>(R.id.userName).text.toString()
         val password = stuViewModel.getStudentPassword(usernameText)
         if (password.equals(passwordText)) {
-//            var courselist = mutableListOf<Course>()
-//            val course = Course()
-//            course.setCourseName("new courseName")
-//            courselist.add(course)
-//            val student = Student("Liumxiris", "kkkkk", courselist)
-//            stuViewModel.updateStudent(student)
 
-//            val intent = Intent(this@HomeActivity, CourseEditActivity::class.java)
-//            intent.putExtra("USERNAME", usernameText)
-//            intent.putExtra("PASSWORD", passwordText)
-//            startActivity(intent)
             user_name = usernameText
             pass_word = passwordText
             showCalendarFragment()
@@ -143,6 +119,7 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    //save new user to database
     fun registerUser(view: View){
         val username = findViewById<EditText>(R.id.userName).text.toString()
         val password = findViewById<EditText>(R.id.passWord).text.toString()
@@ -175,10 +152,6 @@ class HomeActivity : AppCompatActivity() {
     fun getCurrentId():Int{
         val settings: SharedPreferences
         settings = getSharedPreferences("ID_SAVING", Context.MODE_PRIVATE)
-
-        //get the sharepref
-
-        //get the sharepref
         val currentId = settings.getInt("ID", 0)
         return currentId+1
     }
